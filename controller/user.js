@@ -111,24 +111,24 @@ const getAllMessageChats = async (req, res) => {
     }
 }
 
-// const getUserChats = async (req, res) => {
-//   try {
-//     const userId = req.user.userId;
+const getUserChats = async (req, res) => {
+  try {
+    const userId = req.user.userId;
 
-//     // Find the user and populate the chats array with only the name and _id of each chat user
-//     const user = await User.findById(userId)
-//       .populate('chats', 'name _id') // populate only name and _id fields of the referenced users
-//       .select('chats'); // select only the chats field from the main user document
+    // Find the user and populate the chats array with only the name and _id of each chat user
+    const user = await User.findById(userId)
+      .populate('chats', 'name _id') // populate only name and _id fields of the referenced users
+      .select('chats'); // select only the chats field from the main user document
     
-//     if (!user) {
-//       return res.status(404).json({ message: 'User not found' });
-//     }
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
-//     res.status(200).json({message:"all users received ", data:user.chats});
-//   } catch (error) {
-//     res.status(500).json({ message: 'Error fetching chats', error });
-//   }
-// };
+    res.status(200).json({message:"all users received ", data:user.chats});
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching chats', error });
+  }
+};
 
 module.exports = {
   signup,
