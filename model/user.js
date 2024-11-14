@@ -13,6 +13,10 @@ const userSchema = new Schema(
       required: true,
       unique: true,
     },
+    profileImage: {
+      type: String,
+      
+    },
     password: {
       type: String,
       required: true,
@@ -20,9 +24,11 @@ const userSchema = new Schema(
     gender: {
       type: String,
       enum: ["male", "female", "other"],
-      default:"other"
-    }
+      default: "other",
+    },
+    chats: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   },
+
   {
     timestamps: true,
   }
