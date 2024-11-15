@@ -28,6 +28,7 @@ const signup = async (req, res) => {
         name: savedUser.name,
         email: savedUser.email,
         gender: savedUser.gender,
+        
       },
       message: "sign up successful",
     });
@@ -67,6 +68,7 @@ const signin = async (req, res) => {
       name: user.name,
       email: user.email,
       gender: user.gender,
+      profileImage:user?.profileImage,
       _id: user._id,
       token,
     });
