@@ -42,9 +42,9 @@ const onlineUsers = {};
 io.on("connection", (socket) => {
   console.log("user connected", socket.id);
   socket.on("a new user connected", (userId) => {
-    console.log(userId);
+   // console.log(userId);
     onlineUsers[userId] = socket.id;
-    console.log(onlineUsers)
+    console.log('all sockets we have => ', onlineUsers)
   });
   
   socket.on("send-message", async (data) => {
@@ -52,21 +52,31 @@ io.on("connection", (socket) => {
     // from => userId of the sender
     
     const { message, to, from } = data;
+    console.log('message from ', from);
     const newMessage = new Message({
       content: message,
       sender: from,
       receiver: to,
     });
     await newMessage.save();
+    //console.log(onlineUsers[to])
     if (onlineUsers[to]) {
-      io.to(onlineUsers[to]).emit('receive-message', message)
+      io.to(onlineUsers[to]).emit('receive-message', { content: message, sender: from })
+      console.log('message sent to the ', to)
     }
-      
+       
   });
   socket.on("disconnect", (reason) => {
     console.log("Disconnected from server:", reason);
+    for (const userId in onlineUsers) {
+      if (onlineUsers[userId] === socket.id) {
+        delete onlineUsers[userId];
+        break;
+      }
+    }
   });
 });
+
 
 server.listen(port, () => {
   console.log(`Server is running on ${port}`);
