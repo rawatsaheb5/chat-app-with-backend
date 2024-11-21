@@ -9,6 +9,7 @@ const dotenv = require("dotenv");
 const path = require("path");
 const authRoutes = require("./route/user");
 const messageRoute = require('./route/message')
+const groupRoute = require('./route/group')
 const cors = require("cors");
 const Message = require("./model/message");
 const port = process.env.PORT || 8000;
@@ -28,7 +29,10 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
-app.use('/api/message', messageRoute)
+app.use('/api/message', messageRoute);
+app.use('/api/group', groupRoute)
+
+
 app.get("/", (req, res) => {
   app.send("server is running fine ");
 });
