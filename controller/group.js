@@ -121,9 +121,41 @@ const addMemberToTheGroup = async (req, res) => {
   }
 };
 
+const removeMemberFromTheGroup = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    // we allow admin to add multiple users to the group
+    const { groupId, memberId } = req.body;
+
+    const group = await Group.findOne({ _id: groupId });
+    if (!group) {
+      return res.status(400).json({
+        message: "Group doesn't exists!",
+      });
+    }
+    if (!group.admin.includes(userId)) {
+      return res.status(400).json({
+        message:
+          "You are not admin, Only admin can add other members to the group",
+      });
+    }
+    group.admin = group.admin.forEach((id) => id !== memberId);
+    await group.save();
+
+    res.status(200).json({
+      message: "member removed from the group",
+      data: group,
+    });
+
+  } catch (error) {
+    //console.log(error);
+    return res.status(500).json({ message: "Error in creating Admin", error });
+  }
+};
 module.exports = {
   createGroup,
   MakeOtherUserAsAdmin,
   removeUserAsAdmin,
-  addMemberToTheGroup
+  addMemberToTheGroup,
+  removeMemberFromTheGroup,
 };
