@@ -152,10 +152,29 @@ const removeMemberFromTheGroup = async (req, res) => {
     return res.status(500).json({ message: "Error in creating Admin", error });
   }
 };
+const fetchAllGroupsJoinedByUser = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+   
+    const group = await Group.find({members:userId});
+
+    res.status(200).json({
+      message: "fetched all groups joined by the user",
+      data: group,
+    });
+
+  } catch (error) {
+    //console.log(error);
+    return res.status(500).json({ message: "Error in fetching group", error });
+  }
+};
+
+
 module.exports = {
   createGroup,
   MakeOtherUserAsAdmin,
   removeUserAsAdmin,
   addMemberToTheGroup,
   removeMemberFromTheGroup,
+  fetchAllGroupsJoinedByUser
 };
