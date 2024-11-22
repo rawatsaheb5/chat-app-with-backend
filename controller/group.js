@@ -45,19 +45,50 @@ const MakeOtherUserAsAdmin = async (req, res) => {
     });
     await haveYouAccessToMakeOtherAdmin.save();
 
-    res
-      .status(200)
-      .json({
-        message: "All members are marked as Admin",
-        data: haveYouAccessToMakeOtherAdmin,
-      });
+    res.status(200).json({
+      message: "All members are marked as Admin",
+      data: haveYouAccessToMakeOtherAdmin,
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Error in creating Admin", error });
   }
 };
 
+const removeUserAsAdmin = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { groupId, memberId } = req.body;
+
+    const haveYouAccessToMakeOtherAdmin = await Group.findOne({
+      _id: groupId,
+      admin: userId,
+    });
+
+    if (!haveYouAccessToMakeOtherAdmin) {
+      return res.status(400).json({
+        message: "You are not admin, Only admin can make other user admin",
+      });
+    }
+    haveYouAccessToMakeOtherAdmin.admin =
+      haveYouAccessToMakeOtherAdmin.admin.filter.filter(
+        (item) => item !== memberId
+      );
+    await haveYouAccessToMakeOtherAdmin.save();
+
+    res.status(200).json({
+      message: "member removed removed from admin",
+      data: haveYouAccessToMakeOtherAdmin,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Error in creating Admin", error });
+  }
+};
+
+
 module.exports = {
-    createGroup,
-    MakeOtherUserAsAdmin,
+  createGroup,
+  MakeOtherUserAsAdmin,
+  removeUserAsAdmin,
 };
