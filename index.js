@@ -11,7 +11,8 @@ const authRoutes = require("./route/user");
 const messageRoute = require('./route/message')
 const groupRoute = require('./route/group')
 const cors = require("cors");
-const Message = require("./model/message");
+
+const groupMessageRoute = require('./route/groupMessage')
 const port = process.env.PORT || 8000;
 
 dotenv.config();
@@ -30,8 +31,8 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use('/api/message', messageRoute);
-app.use('/api/group', groupRoute)
-
+app.use('/api/group', groupRoute);
+app.use('/api/message',groupMessageRoute)
 
 app.get("/", (req, res) => {
   app.send("server is running fine ");
