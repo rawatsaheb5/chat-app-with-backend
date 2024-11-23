@@ -59,7 +59,27 @@ const editGroupMessage = async (req, res) => {
   }
 };
 
+// fetch all group messages using groupId
+// to do later => pagination, query optimization
+const fetchAllGroupMessages = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const groupId = req.params.groupId;
+
+    const allGroupMessages = await GroupMessage.find({ groupId: groupId });
+
+    res.status(200).json({
+      message: "Group message fetched successfully!",
+    });
+  } catch (error) {
+    //console.log(error);
+    return res
+      .status(500)
+      .json({ message: "Error in fetching all Group messages", error });
+  }
+};
 module.exports = {
-    deleteSingleMessageOfGroup,
-    editGroupMessage,
+  deleteSingleMessageOfGroup,
+  editGroupMessage,
+  fetchAllGroupMessages,
 };
