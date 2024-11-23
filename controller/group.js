@@ -173,7 +173,7 @@ const fetchAllGroupsJoinedByUser = async (req, res) => {
 const deleteGroup = async (req, res) => {
   try {
     const userId = req.user.userId;
-    // we allow admin to add multiple users to the group
+    
     const { groupId } = req.body;
 
     const group = await Group.findOne({ _id: groupId });
