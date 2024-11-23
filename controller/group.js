@@ -169,6 +169,37 @@ const fetchAllGroupsJoinedByUser = async (req, res) => {
   }
 };
 
+// Group can only be deleted by the creator of the group
+const deleteGroup = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    // we allow admin to add multiple users to the group
+    const { groupId } = req.body;
+
+    const group = await Group.findOne({ _id: groupId });
+    if (!group) {
+      return res.status(400).json({
+        message: "Group doesn't exists!",
+      });
+    }
+    if (!group.admin.includes(userId) && group.createdBy !== userId) {
+      return res.status(400).json({
+        message:
+          "You are not admin, Only admin and creator can delete the group ",
+      });
+    }
+    
+    await Group.findByIdAndDelete({_id:groupId})
+
+    res.status(200).json({
+      message: "Group deleted",
+    });
+
+  } catch (error) {
+    //console.log(error);
+    return res.status(500).json({ message: "Error in deleting Group", error });
+  }
+};
 
 module.exports = {
   createGroup,
@@ -176,5 +207,6 @@ module.exports = {
   removeUserAsAdmin,
   addMemberToTheGroup,
   removeMemberFromTheGroup,
-  fetchAllGroupsJoinedByUser
+  fetchAllGroupsJoinedByUser,
+  deleteGroup
 };
