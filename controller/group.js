@@ -146,7 +146,6 @@ const removeMemberFromTheGroup = async (req, res) => {
       message: "member removed from the group",
       data: group,
     });
-
   } catch (error) {
     //console.log(error);
     return res.status(500).json({ message: "Error in creating Admin", error });
@@ -155,14 +154,13 @@ const removeMemberFromTheGroup = async (req, res) => {
 const fetchAllGroupsJoinedByUser = async (req, res) => {
   try {
     const userId = req.user.userId;
-   
-    const group = await Group.find({members:userId});
+
+    const group = await Group.find({ members: userId });
 
     res.status(200).json({
       message: "fetched all groups joined by the user",
       data: group,
     });
-
   } catch (error) {
     //console.log(error);
     return res.status(500).json({ message: "Error in fetching group", error });
@@ -173,7 +171,7 @@ const fetchAllGroupsJoinedByUser = async (req, res) => {
 const deleteGroup = async (req, res) => {
   try {
     const userId = req.user.userId;
-    
+
     const { groupId } = req.body;
 
     const group = await Group.findOne({ _id: groupId });
@@ -188,16 +186,46 @@ const deleteGroup = async (req, res) => {
           "You are not admin, Only admin and creator can delete the group ",
       });
     }
-    
-    await Group.findByIdAndDelete({_id:groupId})
+
+    await Group.findByIdAndDelete({ _id: groupId });
 
     res.status(200).json({
       message: "Group deleted",
     });
-
   } catch (error) {
     //console.log(error);
     return res.status(500).json({ message: "Error in deleting Group", error });
+  }
+};
+
+// edit group (only group name changes)
+const editGroupName = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    const { groupId, groupName } = req.body;
+    if (!groupName) {
+      return res.status(400).json({
+        message: "Group name is required!",
+      });
+    }
+    const group = await Group.findById({ _id: groupId });
+    if (!group) {
+      return res.status(400).json({
+        message: "Group doesn't exists!",
+      });
+    }
+
+    group.groupName = content;
+    await group.save();
+    res.status(200).json({
+      message: "Group name is updated",
+    });
+  } catch (error) {
+    //console.log(error);
+    return res
+      .status(500)
+      .json({ message: "Error in editing Group name", error });
   }
 };
 
@@ -208,5 +236,6 @@ module.exports = {
   addMemberToTheGroup,
   removeMemberFromTheGroup,
   fetchAllGroupsJoinedByUser,
-  deleteGroup
+  deleteGroup,
+  editGroupName,
 };
