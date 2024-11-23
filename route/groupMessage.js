@@ -5,6 +5,6 @@ const router = express.Router();
 
 
 router.delete('/:messageId', verifyToken, deleteSingleMessageOfGroup)
-router.delete('/:messageId', verifyToken, editGroupMessage)
+router.put('/:messageId', verifyToken, editGroupMessage)
 
 module.exports = router;
