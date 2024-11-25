@@ -24,6 +24,7 @@ const createGroup = async (req, res) => {
     const addOnlyUserWhoAreInChats = userInfo.chats.filter((id) =>
       members.includes(id.toString())
     );
+    addOnlyUserWhoAreInChats.push(userId);
 
     const newGroup = new Group({
       groupName,
@@ -190,6 +191,8 @@ const removeMemberFromTheGroup = async (req, res) => {
 
     // removing member
     group.members = group.members.filter((id) => id.toString() !== memberId);
+    // also remove from admin if any one
+    group.admin = group.admin.filter((id) => id.toString() !== memberId);
     await group.save();
 
     res.status(200).json({
