@@ -19,6 +19,8 @@ const createGroup = async (req, res) => {
     }
 
     const userInfo = await User.findById({ _id: userId });
+
+    // filtering members who are in chats of user
     const addOnlyUserWhoAreInChats = userInfo.chats.filter((id) =>
       members.includes(id.toString())
     );
@@ -35,7 +37,7 @@ const createGroup = async (req, res) => {
       .status(201)
       .json({ message: "Group is created successfully", data: newGroup });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return res.status(500).json({ message: "Error in creating error", error });
   }
 };
@@ -103,38 +105,53 @@ const removeUserAsAdmin = async (req, res) => {
   }
 };
 
+/*
+
+  => we allow only admin can add members to the group
+  => to add in group , we require groupId and , array of 1 or more members
+
+*/
 const addMemberToTheGroup = async (req, res) => {
   try {
     const userId = req.user.userId;
-    // we allow admin to add multiple users to the group
-    const { groupId, members } = req.body;
+    const groupId = req.params.groupId;
+    const { members } = req.body;
 
-    const group = await Group.findOne({ _id: groupId });
+    if (members.length === 0) {
+      return res.status(400).json({
+        message: "one or more members are required to add in group!",
+      });
+    }
+    const group = await Group.findById({ _id: groupId });
     if (!group) {
       return res.status(400).json({
         message: "Group doesn't exists!",
       });
     }
+
+    // checking for whether user is admin or not
     if (!group.admin.includes(userId)) {
       return res.status(400).json({
         message:
           "You are not admin, Only admin can add other members to the group",
       });
     }
+
+    // removing dublicate members from the group
     members.forEach((memberId) => {
-      if (!group.admin.includes(memberId)) {
-        group.admin.push(memberId);
+      if (!group.members.includes(memberId)) {
+        group.members.push(memberId);
       }
     });
     await group.save();
 
     res.status(200).json({
-      message: "member removed removed from admin",
+      message: "members added to the group",
       data: group,
     });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ message: "Error in creating Admin", error });
+    //console.log(error);
+    return res.status(500).json({ message: "Error in adding members to the group", error });
   }
 };
 
