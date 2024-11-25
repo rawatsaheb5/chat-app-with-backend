@@ -155,25 +155,41 @@ const addMemberToTheGroup = async (req, res) => {
   }
 };
 
+/*  
+  => we allow only admin can remove other member from the group (only 1 member at a time)
+  => admin can remove other admin also but not to the creater of the group
+
+*/ 
 const removeMemberFromTheGroup = async (req, res) => {
   try {
     const userId = req.user.userId;
-    // we allow admin to add multiple users to the group
-    const { groupId, memberId } = req.body;
-
-    const group = await Group.findOne({ _id: groupId });
+    const groupId = req.params.groupId;
+    const {  memberId } = req.body;
+    
+    const group = await Group.findById({ _id: groupId });
     if (!group) {
       return res.status(400).json({
         message: "Group doesn't exists!",
       });
     }
+
+    // check whether the user is admin or not
     if (!group.admin.includes(userId)) {
       return res.status(400).json({
         message:
-          "You are not admin, Only admin can add other members to the group",
+          "You are not admin, Only admin can remove other member from the group",
       });
     }
-    group.admin = group.admin.forEach((id) => id !== memberId);
+
+    if (group.createdBy.toString() === memberId) {
+      return res.status(400).json({
+        message:
+          "You are not allowed to remove creator of the group",
+      });
+    }
+
+    // removing member
+    group.members = group.members.filter((id) => id.toString() !== memberId);
     await group.save();
 
     res.status(200).json({
@@ -182,7 +198,7 @@ const removeMemberFromTheGroup = async (req, res) => {
     });
   } catch (error) {
     //console.log(error);
-    return res.status(500).json({ message: "Error in creating Admin", error });
+    return res.status(500).json({ message: "Error in removing member from the group", error });
   }
 };
 const fetchAllGroupsJoinedByUser = async (req, res) => {
