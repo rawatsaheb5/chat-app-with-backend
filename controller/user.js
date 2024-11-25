@@ -45,13 +45,13 @@ const signin = async (req, res) => {
     // Check if the user with the given email exists
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).json({ error: "Invalid email or password" });
+      return res.status(400).json({ error: "Invalid email or password" });
     }
 
     // Verify the password
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
-      return res.status(401).json({ error: "Invalid email or password" });
+      return res.status(400).json({ error: "Invalid email or password" });
     }
 
     // Generate a JWT token

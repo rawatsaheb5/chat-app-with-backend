@@ -1,21 +1,38 @@
+const mongoose = require("mongoose");
+const { trimBothSideSpaces } = require("../helper/transform");
 const Group = require("../model/group");
+const User = require("../model/user");
 
+/*
+  => a user can create a group with group name and array of members
+  => only those members will be added to the group who are in chats of user
+
+*/
 const createGroup = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const { groupName, members } = req.body;
+    let groupName = req.body.groupName.trim();
+    const members = req.body.members;
+
     if (!groupName) {
       return res.status(400).json({ message: "groupName is required!" });
     }
+
+    const userInfo = await User.findById({ _id: userId });
+    const addOnlyUserWhoAreInChats = userInfo.chats.filter((id) =>
+      members.includes(id.toString())
+    );
+
     const newGroup = new Group({
       groupName,
       createdBy: userId,
       admin: userId,
-      members,
+      members: addOnlyUserWhoAreInChats,
     });
     await newGroup.save();
+
     res
-      .status(200)
+      .status(201)
       .json({ message: "Group is created successfully", data: newGroup });
   } catch (error) {
     console.log(error);
@@ -198,7 +215,7 @@ const deleteGroup = async (req, res) => {
   }
 };
 
-// edit group (only group name changes)
+// edit group (only group name changes) everyone can change group name
 const editGroupName = async (req, res) => {
   try {
     const userId = req.user.userId;
