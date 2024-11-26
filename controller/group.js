@@ -92,34 +92,46 @@ const MakeOtherUserAsAdmin = async (req, res) => {
   }
 };
 
+/*
+  => admin can remove other group members from admin but can't remove to the creator of group
+  => 
+
+*/
 const removeUserAsAdmin = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const { groupId, memberId } = req.body;
+    const groupId = req.params.groupId;
+    const { memberId } = req.body;
 
-    const haveYouAccessToMakeOtherAdmin = await Group.findOne({
+    const group = await Group.findOne({
       _id: groupId,
       admin: userId,
     });
 
-    if (!haveYouAccessToMakeOtherAdmin) {
+    if (!group) {
       return res.status(400).json({
-        message: "You are not admin, Only admin can make other user admin",
+        message: "You are not admin, Only admin can remove other members",
       });
     }
-    haveYouAccessToMakeOtherAdmin.admin =
-      haveYouAccessToMakeOtherAdmin.admin.filter.filter(
-        (item) => item !== memberId
-      );
-    await haveYouAccessToMakeOtherAdmin.save();
+    
+    // checking whether you are trying to remove creator of group
+    if (group.createdBy.toString() === memberId) {
+      return res.status(400).json({
+        message: "You can't remove group creator from admin role",
+      });
+    }
+
+    // removing from admin
+    group.admin = group.admin.filter((id) => id.toString() !== memberId);
+    await group.save();
 
     res.status(200).json({
-      message: "member removed removed from admin",
-      data: haveYouAccessToMakeOtherAdmin,
+      message: "member removed from admin",
+      data: group,
     });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: "Error in creating Admin", error });
+    return res.status(500).json({ message: "Error in removing member from Admin", error });
   }
 };
 

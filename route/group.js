@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post('/', verifyToken, createGroup)
 router.put('/make-admin/:groupId', verifyToken, MakeOtherUserAsAdmin)
-router.put('/remove-from-admin', verifyToken, removeUserAsAdmin)
+router.put('/remove-from-admin/:groupId', verifyToken, removeUserAsAdmin)
 router.put('/add-to-group/:groupId', verifyToken, addMemberToTheGroup)
 router.put('/remove-from-group/:groupId', verifyToken, removeMemberFromTheGroup)
 router.put('/exit-from-group/:groupId', verifyToken, exitFromTheGroup)
