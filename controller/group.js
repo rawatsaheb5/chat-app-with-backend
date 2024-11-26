@@ -286,26 +286,31 @@ const fetchAllGroupsJoinedByUser = async (req, res) => {
   }
 };
 
-// Group can only be deleted by the creator of the group
+/*
+  => Group can only be deleted by the creator of the group
+  => when group will be deleted all message associated with the group also deleted (*todo)
+*/
+
 const deleteGroup = async (req, res) => {
   try {
     const userId = req.user.userId;
+    const groupId = req.params.groupId;
 
-    const { groupId } = req.body;
-
-    const group = await Group.findOne({ _id: groupId });
+    const group = await Group.findById({ _id: groupId });
     if (!group) {
       return res.status(400).json({
         message: "Group doesn't exists!",
       });
     }
-    if (!group.admin.includes(userId) && group.createdBy !== userId) {
+
+    // check you are authorize to delete the group
+    if (!group.admin.includes(userId) && group.createdBy.toString() !== userId) {
       return res.status(400).json({
         message:
           "You are not admin, Only admin and creator can delete the group ",
       });
     }
-
+    // to do => implement remove all group messages
     await Group.findByIdAndDelete({ _id: groupId });
 
     res.status(200).json({
