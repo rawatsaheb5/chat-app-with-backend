@@ -321,8 +321,9 @@ const deleteGroup = async (req, res) => {
 const editGroupName = async (req, res) => {
   try {
     const userId = req.user.userId;
+    const groupId = req.params.groupId;
+    let groupName = req.body.groupName.trim();
 
-    const { groupId, groupName } = req.body;
     if (!groupName) {
       return res.status(400).json({
         message: "Group name is required!",
@@ -335,7 +336,7 @@ const editGroupName = async (req, res) => {
       });
     }
 
-    group.groupName = content;
+    group.groupName = groupName;
     await group.save();
     res.status(200).json({
       message: "Group name is updated",
