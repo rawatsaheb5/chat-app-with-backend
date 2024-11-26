@@ -43,34 +43,51 @@ const createGroup = async (req, res) => {
   }
 };
 
+/*
+  => admin can make other group members as admin
+  => 
+
+*/
 const MakeOtherUserAsAdmin = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const { members, groupId } = req.body;
+    const groupId = req.params.groupId;
+    const { members } = req.body;
 
-    const haveYouAccessToMakeOtherAdmin = await Group.findOne({
+    // check whether you are admin of the group
+    const group = await Group.findOne({
       _id: groupId,
       admin: userId,
     });
 
-    if (!haveYouAccessToMakeOtherAdmin) {
+    if (!group) {
       return res.status(400).json({
         message: "You are not admin, Only admin can make other user admin",
       });
     }
+
+    // filter members that are part of group
+    const filteredMembers = [];
     members.forEach((element) => {
-      if (!haveYouAccessToMakeOtherAdmin.admin.includes(element)) {
-        haveYouAccessToMakeOtherAdmin.admin.push(element);
+      if (group.members.includes(element)) {
+        filteredMembers.push(element);
       }
     });
-    await haveYouAccessToMakeOtherAdmin.save();
+
+    // mark members admin who are part of group
+    filteredMembers.forEach((element) => {
+      if (!group.admin.includes(element)) {
+        group.admin.push(element);
+      }
+    });
+    await group.save();
 
     res.status(200).json({
       message: "All members are marked as Admin",
-      data: haveYouAccessToMakeOtherAdmin,
+      data: group,
     });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return res.status(500).json({ message: "Error in creating Admin", error });
   }
 };
@@ -152,7 +169,9 @@ const addMemberToTheGroup = async (req, res) => {
     });
   } catch (error) {
     //console.log(error);
-    return res.status(500).json({ message: "Error in adding members to the group", error });
+    return res
+      .status(500)
+      .json({ message: "Error in adding members to the group", error });
   }
 };
 
@@ -160,13 +179,13 @@ const addMemberToTheGroup = async (req, res) => {
   => we allow only admin can remove other member from the group (only 1 member at a time)
   => admin can remove other admin also but not to the creater of the group
 
-*/ 
+*/
 const removeMemberFromTheGroup = async (req, res) => {
   try {
     const userId = req.user.userId;
     const groupId = req.params.groupId;
-    const {  memberId } = req.body;
-    
+    const { memberId } = req.body;
+
     const group = await Group.findById({ _id: groupId });
     if (!group) {
       return res.status(400).json({
@@ -184,8 +203,7 @@ const removeMemberFromTheGroup = async (req, res) => {
 
     if (group.createdBy.toString() === memberId) {
       return res.status(400).json({
-        message:
-          "You are not allowed to remove creator of the group",
+        message: "You are not allowed to remove creator of the group",
       });
     }
 
@@ -201,7 +219,9 @@ const removeMemberFromTheGroup = async (req, res) => {
     });
   } catch (error) {
     //console.log(error);
-    return res.status(500).json({ message: "Error in removing member from the group", error });
+    return res
+      .status(500)
+      .json({ message: "Error in removing member from the group", error });
   }
 };
 
@@ -209,13 +229,12 @@ const removeMemberFromTheGroup = async (req, res) => {
   => anyone can exit from the group if he is part of it
   => if he is admin also remove from admin post
 
-*/ 
+*/
 const exitFromTheGroup = async (req, res) => {
   try {
     const userId = req.user.userId;
     const groupId = req.params.groupId;
-    
-    
+
     const group = await Group.findById({ _id: groupId });
     if (!group) {
       return res.status(400).json({
@@ -234,7 +253,9 @@ const exitFromTheGroup = async (req, res) => {
     });
   } catch (error) {
     //console.log(error);
-    return res.status(500).json({ message: "Error in exiting from the group", error });
+    return res
+      .status(500)
+      .json({ message: "Error in exiting from the group", error });
   }
 };
 const fetchAllGroupsJoinedByUser = async (req, res) => {
@@ -324,5 +345,5 @@ module.exports = {
   fetchAllGroupsJoinedByUser,
   deleteGroup,
   editGroupName,
-  exitFromTheGroup
+  exitFromTheGroup,
 };
