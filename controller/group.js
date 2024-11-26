@@ -204,6 +204,39 @@ const removeMemberFromTheGroup = async (req, res) => {
     return res.status(500).json({ message: "Error in removing member from the group", error });
   }
 };
+
+/*  
+  => anyone can exit from the group if he is part of it
+  => if he is admin also remove from admin post
+
+*/ 
+const exitFromTheGroup = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const groupId = req.params.groupId;
+    
+    
+    const group = await Group.findById({ _id: groupId });
+    if (!group) {
+      return res.status(400).json({
+        message: "Group doesn't exists!",
+      });
+    }
+    // exiting from the group
+    group.members = group.members.filter((id) => id.toString() !== userId);
+    // also exiting from admin post
+    group.admin = group.admin.filter((id) => id.toString() !== userId);
+    await group.save();
+
+    res.status(200).json({
+      message: "exited from the group",
+      data: group,
+    });
+  } catch (error) {
+    //console.log(error);
+    return res.status(500).json({ message: "Error in exiting from the group", error });
+  }
+};
 const fetchAllGroupsJoinedByUser = async (req, res) => {
   try {
     const userId = req.user.userId;
@@ -291,4 +324,5 @@ module.exports = {
   fetchAllGroupsJoinedByUser,
   deleteGroup,
   editGroupName,
+  exitFromTheGroup
 };

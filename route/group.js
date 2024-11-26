@@ -1,6 +1,6 @@
 const express = require('express');
 const verifyToken = require('../middleware/auth');
-const { createGroup, MakeOtherUserAsAdmin, removeUserAsAdmin, addMemberToTheGroup, removeMemberFromTheGroup, fetchAllGroupsJoinedByUser, deleteGroup, editGroupName } = require('../controller/group');
+const { createGroup, MakeOtherUserAsAdmin, removeUserAsAdmin, addMemberToTheGroup, removeMemberFromTheGroup, fetchAllGroupsJoinedByUser, deleteGroup, editGroupName, exitFromTheGroup } = require('../controller/group');
 
 const router = express.Router();
 
@@ -10,6 +10,7 @@ router.put('/make-admin', verifyToken, MakeOtherUserAsAdmin)
 router.put('/remove-from-admin', verifyToken, removeUserAsAdmin)
 router.put('/add-to-group/:groupId', verifyToken, addMemberToTheGroup)
 router.put('/remove-from-group/:groupId', verifyToken, removeMemberFromTheGroup)
+router.put('/exit-from-group/:groupId', verifyToken, exitFromTheGroup)
 router.get('/get-all-groups', verifyToken, fetchAllGroupsJoinedByUser)
 router.delete('/delete-group', verifyToken, deleteGroup)
 router.put('/edit-group-name', verifyToken, editGroupName)
