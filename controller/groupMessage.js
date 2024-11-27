@@ -1,6 +1,42 @@
 const Group = require("../model/group");
 const GroupMessage = require("../model/groupMessage");
 
+/*
+  => createGroupMessage controller will take userId, groupId, content to create group message
+
+*/
+const createGroupMessage = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const groupId = req.params.groupId;
+    let { content } = req.body;
+
+    if (!groupId) {
+      return res.status(400).json({ message: "groupId is required!" });
+    }
+    if (!content.trim()) {
+      return res.status(400).json({ message: "content is required!" });
+    }
+    
+    const groupMessage = new GroupMessage({
+      content: content.trim(),
+      sender: userId,
+      groupId: groupId,
+    });
+
+    await groupMessage.save();
+
+    res.status(201).json({
+      message: "Group message created successfully!",
+    });
+  } catch (error) {
+    //console.log(error);
+    return res
+      .status(500)
+      .json({ message: "Error in creating Group message", error });
+  }
+};
+
 // delete single message of the group by using messageId
 const deleteSingleMessageOfGroup = async (req, res) => {
   try {
@@ -82,4 +118,5 @@ module.exports = {
   deleteSingleMessageOfGroup,
   editGroupMessage,
   fetchAllGroupMessages,
+  createGroupMessage
 };

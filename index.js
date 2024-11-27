@@ -32,7 +32,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use('/api/message', messageRoute);
 app.use('/api/group', groupRoute);
-app.use('/api/message',groupMessageRoute)
+app.use('/api/group-message',groupMessageRoute)
 
 app.get("/", (req, res) => {
   app.send("server is running fine ");
