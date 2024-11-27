@@ -37,13 +37,17 @@ const createGroupMessage = async (req, res) => {
   }
 };
 
-// delete single message of the group by using messageId
+
+/*
+  => delete single message of the group by using messageId
+
+*/
+
 const deleteSingleMessageOfGroup = async (req, res) => {
   try {
     const userId = req.user.userId;
     const messageId = req.params.messageId;
-    const { groupId } = req.body;
-
+   
     const groupMessage = await GroupMessage.findById({ _id: messageId });
     if (!groupMessage) {
       return res.status(400).json({
