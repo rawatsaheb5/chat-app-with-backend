@@ -17,7 +17,7 @@ const createGroupMessage = async (req, res) => {
     if (!content.trim()) {
       return res.status(400).json({ message: "content is required!" });
     }
-    
+
     const groupMessage = new GroupMessage({
       content: content.trim(),
       sender: userId,
@@ -64,13 +64,18 @@ const deleteSingleMessageOfGroup = async (req, res) => {
   }
 };
 
-// edit group message (only content) using messageId
+/*  
+  => edit group message (only content) using messageId
+
+*/ 
+
 const editGroupMessage = async (req, res) => {
   try {
     const userId = req.user.userId;
     const messageId = req.params.messageId;
-    const { content } = req.body;
-    if (!content) {
+    let { content } = req.body;
+
+    if (!content.trim()) {
       return res.status(400).json({
         message: "content is required!",
       });
@@ -82,7 +87,7 @@ const editGroupMessage = async (req, res) => {
       });
     }
 
-    groupMessage.content = content;
+    groupMessage.content = content.trim();
     await groupMessage.save();
     res.status(200).json({
       message: "Group message edited successfully!",
