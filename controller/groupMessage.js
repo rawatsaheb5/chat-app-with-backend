@@ -111,10 +111,11 @@ const fetchAllGroupMessages = async (req, res) => {
     const userId = req.user.userId;
     const groupId = req.params.groupId;
 
-    const allGroupMessages = await GroupMessage.find({ groupId: groupId });
+    const allGroupMessages = await GroupMessage.find({ groupId: groupId }).sort({updatedAt:-1});
 
     res.status(200).json({
       message: "Group message fetched successfully!",
+      data : allGroupMessages
     });
   } catch (error) {
     //console.log(error);
