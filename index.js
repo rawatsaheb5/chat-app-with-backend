@@ -12,7 +12,9 @@ const messageRoute = require('./route/message')
 const groupRoute = require('./route/group')
 const cors = require("cors");
 
-const groupMessageRoute = require('./route/groupMessage')
+const groupMessageRoute = require('./route/groupMessage');
+const GroupMessage = require("./model/groupMessage");
+const Message = require("./model/message");
 const port = process.env.PORT || 8000;
 
 dotenv.config();
@@ -49,8 +51,13 @@ io.on("connection", (socket) => {
   socket.on("a new user connected", (userId) => {
    // console.log(userId);
     onlineUsers[userId] = socket.id;
-    console.log('all sockets we have => ', onlineUsers)
+    //console.log('all sockets we have => ', onlineUsers)
+
   });
+  socket.on('join-group', (groupId) => {
+    socket.join(groupId)
+    console.log(userId,' joined the group')
+  })
   
   socket.on("send-message", async (data) => {
     // to => userId of the user to whom message to sent
@@ -71,6 +78,24 @@ io.on("connection", (socket) => {
     }
        
   });
+
+  // send group message
+  socket.on('send-message-in-group', async (data) => {
+    try {
+      const { content, sender, groupId } = data;
+      const newMessage = new GroupMessage({
+        content,
+        sender,
+        groupId
+      })
+      await newMessage.save();
+      io.to(groupId).emit('receive-group-message',
+        { content, sender, groupId, updatedAt: newMessage.updatedAt })
+    } catch (error) {
+      console.log(error);
+    }
+    
+  })
   socket.on("disconnect", (reason) => {
     console.log("Disconnected from server:", reason);
     for (const userId in onlineUsers) {
@@ -80,6 +105,14 @@ io.on("connection", (socket) => {
       }
     }
   });
+  socket.on('send-group-message', async (data) => {
+    const message = new GroupMessage({
+      content: data.content,
+      sender: from,
+      groupId:groupId
+    })
+    await message.save();
+  })
 });
 
 
