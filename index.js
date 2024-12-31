@@ -105,14 +105,7 @@ io.on("connection", (socket) => {
       }
     }
   });
-  socket.on('send-group-message', async (data) => {
-    const message = new GroupMessage({
-      content: data.content,
-      sender: from,
-      groupId:groupId
-    })
-    await message.save();
-  })
+ 
 });
 
 

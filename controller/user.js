@@ -77,6 +77,8 @@ const signin = async (req, res) => {
   }
 };
 
+
+//
 const addUserToChat = async (req, res) => {
   try {
     // userId => id of the user
