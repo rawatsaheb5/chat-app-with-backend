@@ -105,16 +105,6 @@ const addUserToChat = async (req, res) => {
   }
 };
 
-const getAllMessageChats = async (req, res) => {
-    try {
-        const userId = req.user.userId;
-        const allChats = await User.findById(userId);
-        
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-}
-
 const getUserChats = async (req, res) => {
   try {
     const userId = req.user.userId;
